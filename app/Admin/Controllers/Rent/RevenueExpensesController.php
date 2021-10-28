@@ -40,12 +40,15 @@ class RevenueExpensesController extends AdminController
         foreach ($house_data as $key=>$house){
             $house_list[$house->id] = $house->community.$house->household.$house->room_number;
         }
-        $project_name_list = DB::table('revenue_expenses')->get();
+        $re_list = DB::table('revenue_expenses')->get();
+        $project_list = DB::table('project')->where('status','=','1')->get();
         $project_name_arr = [];
         $handler_arr = [];
-        foreach ($project_name_list as $single_project_name) {
-            $project_name_arr[$single_project_name->project_name] = $single_project_name->project_name;
-            $handler_arr[$single_project_name->handler] = $single_project_name->handler;
+        foreach ($project_list as $single_project) {
+            $project_name_arr[$single_project->name] = $single_project->name;
+        }
+        foreach ($re_list as $single_re) {
+            $handler_arr[$single_re->handler] = $single_re->handler;
         }
 
         $grid->column('id', __('编号'));
@@ -182,6 +185,11 @@ class RevenueExpensesController extends AdminController
         foreach ($house_data as $key=>$house){
             $house_list[$house->id] = $house->community.$house->household.$house->room_number;
         }
+        $project_list = DB::table('project')->where('status','=','1')->get();
+        $project_name_arr = [];
+        foreach ($project_list as $single_project) {
+            $project_name_arr[$single_project->name] = $single_project->name;
+        }
 
         $form->switch('status','状态');
         $states = [
@@ -194,7 +202,7 @@ class RevenueExpensesController extends AdminController
             ->options([
                 1 => '收入',
                 2 => '支出',
-            ])->when(1, function (Form $form) use($house_list) {
+            ])->when(1, function (Form $form) use($house_list,$project_name_arr) {
 
                 //收入
                 $form->radioButton('a', '选择或者填写房间')
@@ -210,7 +218,7 @@ class RevenueExpensesController extends AdminController
                         $form->text('house_name', __('房间快照名'));
                     })->default(1);
                 $form->date('date', __('收入日期'))->default(date('Y-m-d'));
-                $form->text('project_name', __('收入项目名'));
+                $form->select('project_name', __('收入项目名'))->options($project_name_arr);
                 $form->text('des_detail', __('收入明细'));
 
                 $form->text('amount', __('收入金额'))->icon('fa-cny');
@@ -218,7 +226,7 @@ class RevenueExpensesController extends AdminController
                 // $form->text('bill', __('票据'));
                 $form->tags('remarks', __('备注'));
 
-            })->when(2, function (Form $form) use($house_list) {
+            })->when(2, function (Form $form) use($house_list,$project_name_arr) {
 
                 //支出
                 $form->radioButton('a', '选择或者填写房间')
@@ -237,7 +245,7 @@ class RevenueExpensesController extends AdminController
 
                     })->default(1);
                 $form->date('date', __('支出日期'))->default(date('Y-m-d'));
-                $form->text('project_name', __('支出项目名'));
+                $form->select('project_name', __('收入项目名'))->options($project_name_arr);
                 $form->text('des_detail', __('支出明细'));
 
 

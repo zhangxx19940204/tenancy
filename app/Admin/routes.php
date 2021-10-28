@@ -15,6 +15,7 @@ Route::group([
     $router->resource('houses', Rent\HouseController::class);
     $router->resource('tenants', Rent\TenantController::class);
     $router->resource('revenue-expenses', Rent\RevenueExpensesController::class);
+    $router->resource('projects', Rent\ProjectController::class);
 
 
 });
