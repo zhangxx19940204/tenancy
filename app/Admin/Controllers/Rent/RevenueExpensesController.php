@@ -98,13 +98,12 @@ class RevenueExpensesController extends AdminController
         $grid->model()->orderBy('id', 'desc');
         $grid->actions(function ($actions){
             // 去掉删除
-            $actions->disableDelete();
+            // $actions->disableDelete();
             // 去掉编辑
             $actions->disableEdit();
             // 去掉查看
             $actions->disableView();
         });
-
 
         $grid->filter(function ($filter) use($house_list,$project_name_arr,$handler_arr){
 
@@ -139,6 +138,28 @@ class RevenueExpensesController extends AdminController
             });
 
 
+        });
+
+        $grid->export(function ($export) {
+
+            $export->filename(time().'-'.date('Y-m-d').'-导出收入支出表.csv');
+
+            $export->except(['bill',]);
+
+            // $export->only(['column3', 'column4' ...]);
+
+            $export->originalValue(['des_detail', 'house_name','amount','handler','remarks']);
+
+            $export->column('status', function ($value, $original) {
+                if ($original == '1'){
+                    return '启用';
+                }elseif ($original == '0'){
+                    return '未启用';
+                }else{
+                    return '未知状态';
+                }
+
+            });
         });
 
         return $grid;
